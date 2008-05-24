@@ -126,6 +126,14 @@ Example:
       traits => ['Trait'], # "Another::Trait", not "Trait"
       bar    => 'bar',
   );
+  $instance->does('Trait')          # false
+  $instance->does('Another::Trait') # true
+
+  my $instance2 = Another::Class->new(
+      traits => ['+Trait'], # "Trait", not "Another::Trait"
+  );
+  $instance2->does('Trait')          # true
+  $instance2->does('Another::Trait') # false
 
 =head1 BUGS
 
