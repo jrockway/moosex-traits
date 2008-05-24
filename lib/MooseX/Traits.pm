@@ -1,6 +1,9 @@
 package MooseX::Traits;
 use Moose::Role;
 
+our $VERSION   = '0.01';
+our $AUTHORITY = 'id:JROCKWAY';
+
 has 'traits' => (
     is         => 'ro',
     isa        => 'ArrayRef[Str]',
@@ -32,14 +35,16 @@ around new => sub {
       grep { Class::MOP::load_class($_); 1 }
         map { $self->$transform_trait($_) } $self->traits;
 
-    my $metaclass = $self->meta->meta->name;
-    my $new_class = $metaclass->create_anon_class(
+    my @anon_args = (
         superclasses => [$self->meta->name],
-        roles        => [@traits],
         cache        => 1,
     );
+    push @anon_args, roles => [@traits] if @traits;
 
+    my $metaclass = $self->meta->meta->name;    
+    my $new_class = $metaclass->create_anon_class(@anon_args);
     $new_class->rebless_instance($self, @args);
+
     return $self;
 };
 
