@@ -31,31 +31,34 @@ use Test::Exception;
 }
 
 {
-    my $instance = Class->new( traits => ['Trait'], foo => 'hello' );
+    my $instance = Class->new_with_traits( traits => ['Trait'], foo => 'hello' );
     isa_ok $instance, 'Class';
     can_ok $instance, 'foo';
     is $instance->foo, 'hello';
 }
 
 throws_ok {
-    Class->new( traits => ['Trait'] );
+    Class->new_with_traits( traits => ['Trait'] );
 } qr/required/, 'foo is required';
 
 {
-    my $instance = Class->new;
+    my $instance = Class->new_with_traits;
     isa_ok $instance, 'Class';
     ok !$instance->can('foo'), 'this one cannot foo';
 }
 
 {
-    my $instance = Another::Class->new( traits => ['Trait'], bar => 'bar' );
+    my $instance = Another::Class->new_with_traits( traits => ['Trait'], bar => 'bar' );
     isa_ok $instance, 'Another::Class';
     can_ok $instance, 'bar';
     is $instance->bar, 'bar';
 }
 {
-    my $instance = Another::Class->new( traits => ['Trait', '+Trait'], 
-                                        foo => 'foo', bar => 'bar' );
+    my $instance = Another::Class->new_with_traits( 
+        traits   => ['Trait', '+Trait'], 
+        foo      => 'foo',
+        bar      => 'bar',
+    );
     isa_ok $instance, 'Another::Class';
     can_ok $instance, 'foo';
     can_ok $instance, 'bar';
