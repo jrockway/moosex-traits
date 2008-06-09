@@ -6,7 +6,8 @@ our $AUTHORITY = 'id:JROCKWAY';
 
 has '_trait_namespace' => (
     # no accessors or init_arg
-    isa => 'Str',
+    init_arg => undef,
+    isa      => 'Str',
 );
 
 # dont pollute the consuming class with methods they don't want
@@ -29,20 +30,21 @@ my $transform_trait = sub {
 sub new_with_traits {
     my ($class, %args) = @_;
     
-    my @traits = 
-      grep { Class::MOP::load_class($_); 1 }
-        map { $class->$transform_trait($_) } @{ delete $args{traits} || [] };
+    if (my $traits = delete $args{traits}) {
+            
+        Class::MOP::load_class($_) 
+            for map { $_ = $class->$transform_trait($_) } @$traits;    
 
-    my @anon_args = (
-        superclasses => [$class->meta->name],
-        cache        => 1,
-    );
-    push @anon_args, roles => [@traits] if @traits;
+        my $meta = $class->meta->create_anon_class(
+            superclasses => [ blessed($class) || $class ],
+            roles        => $traits,
+            cache        => 1,        
+        );
+        $meta->add_method('meta' => sub { $meta });
+        $class = $meta->name;
+    }
 
-    my $metaclass = $class->meta->meta->name;    
-    my $new_class = $metaclass->create_anon_class(@anon_args);
-
-    return $new_class->name->new(%args);
+    return $class->new(%args);
 }
 
 1;
@@ -89,14 +91,17 @@ in one go, cache the resulting class (for efficiency), and return a
 new instance.  Arguments meant to initialize the applied roles'
 attributes can also be passed to the constructor.
 
+=head1 METHODS
+
+=over 4
+
+=item B<new_with_traits (%args, traits => \@traits)>
+
+=back
+
 =head1 ATTRIBUTES YOUR CLASS GETS
 
 This role will add the following attributes to the consuming class.
-
-=head2 traits
-
-The list of traits to be applied.  Acts as an C<init_arg> and a C<ro>
-accessor.
 
 =head2 _trait_namespace
 
