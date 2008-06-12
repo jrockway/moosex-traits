@@ -1,7 +1,7 @@
 package MooseX::Traits;
 use Moose::Role;
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'id:JROCKWAY';
 
 has '_trait_namespace' => (
@@ -29,16 +29,16 @@ my $transform_trait = sub {
 
 sub new_with_traits {
     my ($class, %args) = @_;
-    
+
     if (my $traits = delete $args{traits}) {
-            
-        Class::MOP::load_class($_) 
-            for map { $_ = $class->$transform_trait($_) } @$traits;    
+
+        Class::MOP::load_class($_)
+            for map { $_ = $class->$transform_trait($_) } @$traits;
 
         my $meta = $class->meta->create_anon_class(
             superclasses => [ blessed($class) || $class ],
             roles        => $traits,
-            cache        => 1,        
+            cache        => 1,
         );
         $meta->add_method('meta' => sub { $meta });
         $class = $meta->name;
@@ -123,7 +123,7 @@ Example:
   use Moose;
   with 'MooseX::Traits';
   has '+_trait_namespace' => ( default => 'Another' );
- 
+
   my $instance = Another::Class->new_with_traits(
       traits => ['Trait'], # "Another::Trait", not "Trait"
       bar    => 'bar',
@@ -140,6 +140,8 @@ Example:
 =head1 AUTHOR
 
 Jonathan Rockway C<< <jrockway@cpan.org> >>
+
+Stevan Little C<< <stevan.little@iinteractive.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
