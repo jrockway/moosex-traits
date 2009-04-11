@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Test::Exception;
 
 { package Trait;
@@ -27,7 +27,7 @@ use Test::Exception;
   use Moose;
   with 'MooseX::Traits';
   has '+_trait_namespace' => ( default => 'Another' );
- 
+
 }
 
 {
@@ -46,7 +46,11 @@ throws_ok {
     isa_ok $instance, 'Class';
     ok !$instance->can('foo'), 'this one cannot foo';
 }
-
+{
+    my $instance = Class->new_with_traits( traits => [] );
+    isa_ok $instance, 'Class';
+    ok !$instance->can('foo'), 'this one cannot foo either';
+}
 {
     my $instance = Another::Class->new_with_traits( traits => ['Trait'], bar => 'bar' );
     isa_ok $instance, 'Another::Class';
@@ -54,8 +58,8 @@ throws_ok {
     is $instance->bar, 'bar';
 }
 {
-    my $instance = Another::Class->new_with_traits( 
-        traits   => ['Trait', '+Trait'], 
+    my $instance = Another::Class->new_with_traits(
+        traits   => ['Trait', '+Trait'],
         foo      => 'foo',
         bar      => 'bar',
     );
