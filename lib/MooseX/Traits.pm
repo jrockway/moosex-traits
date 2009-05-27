@@ -27,16 +27,25 @@ my $transform_trait = sub {
     return join '::', $base, $name;
 };
 
+my $resolve_traits = sub {
+    my ($class, @traits) = @_;
+
+    return map {
+        my $transformed = $class->$transform_trait($_);
+        Class::MOP::load_class($transformed);
+        $transformed;
+    } @traits;
+};
+
 sub new_with_traits {
     my ($class, %args) = @_;
 
     if (my $traits = delete $args{traits}) {
         if(@$traits){
-            Class::MOP::load_class($_)
-                for map { $_ = $class->$transform_trait($_) } @$traits;
+            $traits = [$class->$resolve_traits(@$traits)];
 
             my $meta = $class->meta->create_anon_class(
-                superclasses => [ blessed($class) || $class ],
+                superclasses => [ $class->meta->name ],
                 roles        => $traits,
                 cache        => 1,
             );
