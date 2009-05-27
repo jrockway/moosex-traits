@@ -46,8 +46,14 @@ sub new_with_traits {
         }
     }
 
-    return $class->new(%args);
+    my $constructor = $class->meta->constructor_name;
+    confess "$class does not have a constructor defined via the MOP?"
+      if !$constructor;
+
+    return $class->$constructor(%args);
 }
+
+no Moose::Role;
 
 1;
 
