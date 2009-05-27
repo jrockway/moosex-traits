@@ -10,7 +10,9 @@ has '_trait_namespace' => (
     isa      => 'Str',
 );
 
-# dont pollute the consuming class with methods they don't want
+# note: "$class" throughout is "class name" or "instance of class
+# name"
+
 my $transform_trait = sub {
     my ($class, $name) = @_;
     my $namespace = $class->meta->get_attribute('_trait_namespace');
@@ -62,6 +64,22 @@ sub new_with_traits {
     return $class->$constructor(%args);
 }
 
+sub apply_traits {
+    my ($self, $traits, $rebless_params) = @_;
+
+    # arrayify
+    my @traits = $traits;
+    @traits = @$traits if ref $traits;
+
+    if (@traits) {
+        @traits = $self->$resolve_traits(@traits);
+
+        for my $trait (@traits){
+            $trait->meta->apply($self, rebless_params => $rebless_params || {});
+        }
+    }
+}
+
 no Moose::Role;
 
 1;
@@ -96,6 +114,10 @@ Then use your customized class:
   $class->does('Role'); # true
   $class->foo; # 42
 
+To apply traits to an existing instance:
+
+  $self->apply_traits([qw/Role1 Role2/], { rebless_params => 'go here' });
+
 =head1 DESCRIPTION
 
 Often you want to create components that can be added to a class
@@ -108,11 +130,19 @@ in one go, cache the resulting class (for efficiency), and return a
 new instance.  Arguments meant to initialize the applied roles'
 attributes can also be passed to the constructor.
 
+Alternatively, traits can be applied to an instance with C<apply_traits>,
+arguments for initializing attributes in consumed roles can be in C<%$self>
+(useful for e.g. L<Catalyst> components.)
+
 =head1 METHODS
 
 =over 4
 
-=item B<new_with_traits (%args, traits => \@traits)>
+=item B<< $class->new_with_traits(%args, traits => \@traits) >>
+
+=item B<< $instance->apply_traits($trait => \%args) >>
+
+=item B<< $instance->apply_traits(\@traits => \%args) >>
 
 =back
 
@@ -159,6 +189,8 @@ Example:
 Jonathan Rockway C<< <jrockway@cpan.org> >>
 
 Stevan Little C<< <stevan.little@iinteractive.com> >>
+
+Rafael Kitover C<< <rkitover@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 

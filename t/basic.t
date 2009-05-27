@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 31;
 use Test::Exception;
 
 { package Trait;
@@ -68,4 +68,36 @@ throws_ok {
     can_ok $instance, 'bar';
     is $instance->foo, 'foo';
     is $instance->bar, 'bar';
+}
+
+{
+    my $instance = Class->new;
+    isa_ok $instance, 'Class';
+    ok !$instance->can('foo');
+
+    lives_ok {
+        $instance->apply_traits('Trait' => { foo => 'bar' } );
+    };
+
+    isa_ok $instance, 'Class';
+    can_ok $instance, 'foo';
+    is $instance->foo, 'bar';
+}
+
+{
+    my $instance = Class->new;
+    isa_ok $instance, 'Class';
+    ok !$instance->can('foo');
+    ok !$instance->can('bar');
+
+    lives_ok {
+        $instance->apply_traits(['Trait', 'Another::Trait']
+                                  => { foo => 'bar', bar => 'baz' } );
+    };
+
+    isa_ok $instance, 'Class';
+    can_ok $instance, 'foo';
+    can_ok $instance, 'bar';
+    is $instance->foo, 'bar';
+    is $instance->bar, 'baz';
 }
