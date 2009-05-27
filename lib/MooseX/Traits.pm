@@ -1,7 +1,7 @@
 package MooseX::Traits;
 use Moose::Role;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'id:JROCKWAY';
 
 has '_trait_namespace' => (

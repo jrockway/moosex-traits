@@ -1,3 +1,7 @@
+0.04    Tue May 26 23:00:29 MST 2009
+        - add apply_traits method
+        - use meta->constructor_name instead of 'new'
+
 0.03    Thu Jun 12 11:57:29 CDT 2008
         - stevan changed some stuff
 
