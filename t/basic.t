@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More tests => 34;
 use Test::Exception;
 
 { package Trait;
@@ -53,6 +53,13 @@ throws_ok {
 }
 {
     my $instance = Another::Class->new_with_traits( traits => ['Trait'], bar => 'bar' );
+    isa_ok $instance, 'Another::Class';
+    can_ok $instance, 'bar';
+    is $instance->bar, 'bar';
+}
+# try hashref form
+{
+    my $instance = Another::Class->new_with_traits({ traits => ['Trait'], bar => 'bar' });
     isa_ok $instance, 'Another::Class';
     can_ok $instance, 'bar';
     is $instance->bar, 'bar';
