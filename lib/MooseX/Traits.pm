@@ -8,7 +8,7 @@ has '_trait_namespace' => (
     # no accessors or init_arg
     init_arg => undef,
     isa      => 'Str',
-    is       => 'bare',
+    (Moose->VERSION >= 0.84 ) ? (is => 'bare') : (),
 );
 
 # note: "$class" throughout is "class name" or "instance of class
