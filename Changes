@@ -1,4 +1,4 @@
-0.06    Thu Jun 25 14:06:13 MST 2009
+0.06    Mon Jun 29 00:30:58 CEST 2009
         - use "is => bare" on newer moosen (Closes: RT#47011) (hdp)
         - depend on a Moose version that provides
           meta->constructor_name (Closes RT#46936)
