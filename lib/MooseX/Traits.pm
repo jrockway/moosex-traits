@@ -1,10 +1,12 @@
 package MooseX::Traits;
 use Moose::Role;
 
-use MooseX::Traits::Util;
+use MooseX::Traits::Util qw(new_class_with_traits);
 
 use warnings;
 use warnings::register;
+
+use namespace::autoclean;
 
 our $VERSION   = '0.06';
 our $AUTHORITY = 'id:JROCKWAY';
@@ -27,30 +29,13 @@ sub new_with_traits {
         %args    = @_;
     }
 
-    if (my $traits = delete $args{traits}) {
-        if(@$traits){
-            $traits = [
-                MooseX::Traits::Util::resolve_traits(
-                    $class, @$traits,
-                ),
-            ];
+    my $new_class = new_class_with_traits($class, @{ delete $args{traits} || [] });
 
-            my $meta = $class->meta->create_anon_class(
-                superclasses => [ $class->meta->name ],
-                roles        => $traits,
-                cache        => 1,
-            );
-
-            $meta->add_method('meta' => sub { $meta });
-            $class = $meta->name;
-        }
-    }
-
-    my $constructor = $class->meta->constructor_name;
-    confess "$class does not have a constructor defined via the MOP?"
+    my $constructor = $new_class->constructor_name;
+    confess "$class ($new_class) does not have a constructor defined via the MOP?"
       if !$constructor;
 
-    return $class->$constructor($hashref ? \%args : %args);
+    return $new_class->name->$constructor($hashref ? \%args : %args);
 }
 
 # this code is broken and should never have been added.  i probably

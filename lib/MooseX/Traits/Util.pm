@@ -55,4 +55,24 @@ sub resolve_traits {
     } @traits;
 }
 
+sub new_class_with_traits {
+    my ($class, @traits) = @_;
+
+    check_class($class);
+
+    my $meta;
+    @traits = resolve_traits($class, @traits);
+    if (@traits) {
+        $meta = $class->meta->create_anon_class(
+            superclasses => [ $class->meta->name ],
+            roles        => \@traits,
+            cache        => 1,
+        );
+        $meta->add_method('meta' => sub { $meta });
+    }
+
+    # if no traits were given just return the class meta
+    return $meta ? $meta : $class->meta;
+}
+
 1;
