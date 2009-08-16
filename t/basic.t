@@ -3,6 +3,8 @@ use warnings;
 use Test::More tests => 34;
 use Test::Exception;
 
+use MooseX::Traits; # for "no warnings ..."
+
 { package Trait;
   use Moose::Role;
   has 'foo' => (
@@ -77,7 +79,11 @@ throws_ok {
     is $instance->bar, 'bar';
 }
 
+# deprecated features!  do not use!
+
 {
+    no warnings 'MooseX::Traits';
+
     my $instance = Class->new;
     isa_ok $instance, 'Class';
     ok !$instance->can('foo');
@@ -92,6 +98,8 @@ throws_ok {
 }
 
 {
+    no warnings 'MooseX::Traits';
+
     my $instance = Class->new;
     isa_ok $instance, 'Class';
     ok !$instance->can('foo');

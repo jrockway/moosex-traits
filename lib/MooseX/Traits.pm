@@ -1,6 +1,9 @@
 package MooseX::Traits;
 use Moose::Role;
 
+use warnings;
+use warnings::register;
+
 our $VERSION   = '0.06';
 our $AUTHORITY = 'id:JROCKWAY';
 
@@ -79,8 +82,20 @@ sub new_with_traits {
     return $class->$constructor($hashref ? \%args : %args);
 }
 
+# this code is broken and should never have been added.  i probably
+# won't delete it, but it is definitely not up-to-date with respect to
+# other features, and never will be.
+#
+# runtime role application is fundamentally broken.  if you really
+# need it, write it yourself, but consider applying the roles before
+# you create an instance.
+
 sub apply_traits {
     my ($self, $traits, $rebless_params) = @_;
+
+    # disable this warning with "use MooseX::Traits; no warnings 'MooseX::Traits'"
+    warnings::warnif('apply_traits is deprecated due to being fundamentally broken. '.
+                     q{disable this warning with "no warnings 'MooseX::Traits'"});
 
     # arrayify
     my @traits = $traits;
@@ -159,10 +174,6 @@ C<new_with_traits> can also take a hashref, e.g.:
 
   my $instance = $class->new_with_traits({ traits => \@traits, foo => 'bar' });
 
-=item B<< $instance->apply_traits($trait => \%args) >>
-
-=item B<< $instance->apply_traits(\@traits => \%args) >>
-
 =back
 
 =head1 ATTRIBUTES YOUR CLASS GETS
@@ -208,8 +219,6 @@ Example:
 Jonathan Rockway C<< <jrockway@cpan.org> >>
 
 Stevan Little C<< <stevan.little@iinteractive.com> >>
-
-Rafael Kitover C<< <rkitover@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
