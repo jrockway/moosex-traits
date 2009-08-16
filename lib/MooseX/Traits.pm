@@ -1,7 +1,7 @@
 package MooseX::Traits;
 use Moose::Role;
 
-use MooseX::Traits::NamespaceManager;
+use MooseX::Traits::Util;
 
 use warnings;
 use warnings::register;
@@ -30,7 +30,7 @@ sub new_with_traits {
     if (my $traits = delete $args{traits}) {
         if(@$traits){
             $traits = [
-                MooseX::Traits::NamespaceManager::resolve_traits(
+                MooseX::Traits::Util::resolve_traits(
                     $class, @$traits,
                 ),
             ];
@@ -73,7 +73,7 @@ sub apply_traits {
     @traits = @$traits if ref $traits;
 
     if (@traits) {
-        @traits = MooseX::Traits::NamespaceManager::resolve_traits(
+        @traits = MooseX::Traits::Util::resolve_traits(
             $self, @traits,
         );
 

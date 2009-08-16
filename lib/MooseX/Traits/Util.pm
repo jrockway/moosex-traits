@@ -1,17 +1,27 @@
-package MooseX::Traits::NamespaceManager;
+package MooseX::Traits::Util;
 use strict;
 use warnings;
+
+use Sub::Exporter -setup => {
+    exports => ['new_class_with_traits'],
+};
 
 use Carp qw(confess);
 
 # note: "$class" throughout is "class name" or "instance of class
 # name"
 
+sub check_class {
+    my $class = shift;
+
+    confess "We can't interact with traits for a class ($class) ".
+      "that does not do MooseX::Traits" unless $class->does('MooseX::Traits');
+}
+
 sub transform_trait {
     my ($class, $name) = @_;
 
-    confess "We can't transform traits for a class ($class) ".
-      "that does not do MooseX::Traits" unless $class->does('MooseX::Traits');
+    check_class($class);
 
     my $namespace = $class->meta->find_attribute_by_name('_trait_namespace');
     my $base;
@@ -25,13 +35,12 @@ sub transform_trait {
     return $name unless $base;
     return $1 if $name =~ /^[+](.+)$/;
     return join '::', $base, $name;
-};
+}
 
 sub resolve_traits {
     my ($class, @traits) = @_;
 
-    confess "We can't resolve traits for a class ($class) ".
-      "that does not do MooseX::Traits" unless $class->does('MooseX::Traits');
+    check_class($class);
 
     return map {
         my $orig = $_;
@@ -44,6 +53,6 @@ sub resolve_traits {
             $orig;
         }
     } @traits;
-};
+}
 
 1;
