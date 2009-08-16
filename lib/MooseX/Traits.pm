@@ -34,9 +34,15 @@ my $resolve_traits = sub {
     my ($class, @traits) = @_;
 
     return map {
-        my $transformed = $class->$transform_trait($_);
-        Class::MOP::load_class($transformed);
-        $transformed;
+        my $orig = $_;
+        if(!ref $orig){
+            my $transformed = $class->$transform_trait($orig);
+            Class::MOP::load_class($transformed);
+            $transformed;
+        }
+        else {
+            $orig;
+        }
     } @traits;
 };
 
