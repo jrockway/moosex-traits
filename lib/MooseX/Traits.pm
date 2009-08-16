@@ -1,6 +1,8 @@
 package MooseX::Traits;
 use Moose::Role;
 
+use MooseX::Traits::NamespaceManager;
+
 use warnings;
 use warnings::register;
 
@@ -13,41 +15,6 @@ has '_trait_namespace' => (
     isa      => 'Str',
     is       => 'bare',
 );
-
-# note: "$class" throughout is "class name" or "instance of class
-# name"
-
-my $transform_trait = sub {
-    my ($class, $name) = @_;
-    my $namespace = $class->meta->find_attribute_by_name('_trait_namespace');
-    my $base;
-    if($namespace->has_default){
-        $base = $namespace->default;
-        if(ref $base eq 'CODE'){
-            $base = $base->();
-        }
-    }
-
-    return $name unless $base;
-    return $1 if $name =~ /^[+](.+)$/;
-    return join '::', $base, $name;
-};
-
-my $resolve_traits = sub {
-    my ($class, @traits) = @_;
-
-    return map {
-        my $orig = $_;
-        if(!ref $orig){
-            my $transformed = $class->$transform_trait($orig);
-            Class::MOP::load_class($transformed);
-            $transformed;
-        }
-        else {
-            $orig;
-        }
-    } @traits;
-};
 
 sub new_with_traits {
     my $class = shift;
@@ -62,7 +29,11 @@ sub new_with_traits {
 
     if (my $traits = delete $args{traits}) {
         if(@$traits){
-            $traits = [$class->$resolve_traits(@$traits)];
+            $traits = [
+                MooseX::Traits::NamespaceManager::resolve_traits(
+                    $class, @$traits,
+                ),
+            ];
 
             my $meta = $class->meta->create_anon_class(
                 superclasses => [ $class->meta->name ],
@@ -102,7 +73,9 @@ sub apply_traits {
     @traits = @$traits if ref $traits;
 
     if (@traits) {
-        @traits = $self->$resolve_traits(@traits);
+        @traits = MooseX::Traits::NamespaceManager::resolve_traits(
+            $self, @traits,
+        );
 
         for my $trait (@traits){
             $trait->meta->apply($self, rebless_params => $rebless_params || {});
