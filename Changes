@@ -1,3 +1,8 @@
+0.07    Sun Aug 16 10:38:47 CDT 2009
+        - deprecate apply_traits ("no warnings" to disable warning)
+        - add MooseX::Traits::Util so that other modules can resolve trait names
+        - add new_class_with_traits util function to create classes with traits
+
 0.06    Mon Jun 29 00:30:58 CEST 2009
         - use "is => bare" on newer moosen (Closes: RT#47011) (hdp)
         - depend on a Moose version that provides
