@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More tests => 37;
 use Test::Exception;
 
 use MooseX::Traits; # for "no warnings ..."
@@ -32,8 +32,8 @@ use MooseX::Traits; # for "no warnings ..."
 
 }
 
-{
-    my $instance = Class->new_with_traits( traits => ['Trait'], foo => 'hello' );
+foreach my $trait ( 'Trait', ['Trait' ] ) {
+    my $instance = Class->new_with_traits( traits => $trait, foo => 'hello' );
     isa_ok $instance, 'Class';
     can_ok $instance, 'foo';
     is $instance->foo, 'hello';

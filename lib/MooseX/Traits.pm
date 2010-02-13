@@ -29,7 +29,8 @@ sub new_with_traits {
         %args    = @_;
     }
 
-    my $new_class = new_class_with_traits($class, @{ delete $args{traits} || [] });
+    my $traits = delete $args{traits} || [];
+    my $new_class = new_class_with_traits($class, @{ ref($traits) ? $traits : [ $traits ] } );
 
     my $constructor = $new_class->constructor_name;
     confess "$class ($new_class) does not have a constructor defined via the MOP?"

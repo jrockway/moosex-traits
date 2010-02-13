@@ -1,3 +1,7 @@
+        - Allow you to pass traits => 'OneTrait' rather than having to say
+          traits => ['OneTrait'] to help when getting traits from things that
+          want to send a scalar (e.g. Config::General)
+
 0.07    Sun Aug 16 10:38:47 CDT 2009
         - deprecate apply_traits ("no warnings" to disable warning)
         - add MooseX::Traits::Util so that other modules can resolve trait names
