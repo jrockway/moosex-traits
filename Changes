@@ -1,3 +1,4 @@
+0.08   Sat Feb 13 17:05:23 GMT 2010
         - Allow you to pass traits => 'OneTrait' rather than having to say
           traits => ['OneTrait'] to help when getting traits from things that
           want to send a scalar (e.g. Config::General)
