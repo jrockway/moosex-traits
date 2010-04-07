@@ -8,7 +8,7 @@ use warnings::register;
 
 use namespace::autoclean;
 
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 our $AUTHORITY = 'id:JROCKWAY';
 
 has '_trait_namespace' => (
@@ -18,6 +18,18 @@ has '_trait_namespace' => (
     is       => 'bare',
 );
 
+sub with_traits {
+    my ($class, @traits) = @_;
+
+    my $new_class = new_class_with_traits(
+        $class,
+        @traits,
+    );
+
+    return $new_class->name;
+}
+
+# somewhat deprecated, but use if you want to
 sub new_with_traits {
     my $class = shift;
 
@@ -30,13 +42,15 @@ sub new_with_traits {
     }
 
     my $traits = delete $args{traits} || [];
-    my $new_class = new_class_with_traits($class, @{ ref($traits) ? $traits : [ $traits ] } );
 
-    my $constructor = $new_class->constructor_name;
+    my $new_class = $class->with_traits(ref $traits ? @$traits : $traits );
+
+    my $constructor = $new_class->meta->constructor_name;
     confess "$class ($new_class) does not have a constructor defined via the MOP?"
       if !$constructor;
 
-    return $new_class->name->$constructor($hashref ? \%args : %args);
+    return $new_class->$constructor($hashref ? \%args : %args);
+
 }
 
 # this code is broken and should never have been added.  i probably
@@ -95,7 +109,7 @@ And a class:
 
 Apply the roles to the class at C<new> time:
 
-  my $class = Class->new_with_traits( traits => ['Role'], foo => 42 );
+  my $class = Class->with_traits('Role')->new( foo => 42 );
 
 Then use your customized class:
 
@@ -103,29 +117,41 @@ Then use your customized class:
   $class->does('Role'); # true
   $class->foo; # 42
 
-To apply traits to an existing instance:
-
-  $self->apply_traits([qw/Role1 Role2/], { rebless_params => 'go here' });
-
 =head1 DESCRIPTION
 
 Often you want to create components that can be added to a class
 arbitrarily.  This module makes it easy for the end user to use these
 components.  Instead of requiring the user to create a named class
-with the desired roles applied, or applying roles to the instance
-one-by-one, he can just pass a C<traits> parameter to the class's
-C<new_with_traits> constructor.  This role will then apply the roles
-in one go, cache the resulting class (for efficiency), and return a
-new instance.  Arguments meant to initialize the applied roles'
-attributes can also be passed to the constructor.
+with the desired roles applied, or apply roles to the instance
+one-by-one, he can just create a new class from yours with
+C<with_traits>, and then instantiate that.
 
-Alternatively, traits can be applied to an instance with C<apply_traits>,
-arguments for initializing attributes in consumed roles can be in C<%$self>
-(useful for e.g. L<Catalyst> components.)
+There is also C<new_with_traits>, which exists for compatability
+reasons.  It accepts a C<traits> parameter, creates a new class with
+those traits, and then insantiates it.
+
+   Class->new_with_traits( traits => [qw/Foo Bar/], foo => 42, bar => 1 )
+
+returns exactly the same object as
+
+   Class->with_traits(qw/Foo Bar/)->new( foo => 42, bar => 1 )
+
+would.  But you can also store the result of C<with_traits>, and call
+other methods:
+
+   my $c = Class->with_traits(qw/Foo Bar/);
+   $c->new( foo => 42 );
+   $c->whatever( foo => 1234 );
+
+And so on.
 
 =head1 METHODS
 
 =over 4
+
+=item B<< $class->with_traits( @traits ) >>
+
+Return a new class with the traits applied.  Use like:
 
 =item B<< $class->new_with_traits(%args, traits => \@traits) >>
 
@@ -173,11 +199,25 @@ Example:
   $instance2->does('Trait')          # true
   $instance2->does('Another::Trait') # false
 
-=head1 AUTHOR
+=head1 AUTHORS and CONTRIBUTORS
 
 Jonathan Rockway C<< <jrockway@cpan.org> >>
 
 Stevan Little C<< <stevan.little@iinteractive.com> >>
+
+Tomas Doran C<< <bobtfish@bobtfish.net> >>
+
+Matt S. Trout C<< <mst@shadowcatsystems.co.uk> >>
+
+Jesse Luehrs C<< <doy at tozt dot net> >>
+
+Shawn Moore C<< <sartak@bestpractical.com> >>
+
+Florian Ragwitz C<< <rafl@debian.org> >>
+
+Chris Prather C<< <chris@prather.org> >>
+
+Yuval Kogman C<< <nothingmuch@woobling.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 

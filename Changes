@@ -1,3 +1,7 @@
+0.09   Tue Apr  6 22:51:40 CDT 2010
+        - Class->with_traits(...)->new is now preferred over
+          Class->new_with_traits(...).
+
 0.08   Sat Feb 13 17:05:23 GMT 2010
         - Allow you to pass traits => 'OneTrait' rather than having to say
           traits => ['OneTrait'] to help when getting traits from things that
