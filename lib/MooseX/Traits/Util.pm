@@ -20,6 +20,7 @@ sub check_class {
 
 sub transform_trait {
     my ($class, $name) = @_;
+    return $1 if $name =~ /^[+](.+)$/;
 
     check_class($class);
 
@@ -33,7 +34,6 @@ sub transform_trait {
     }
 
     return $name unless $base;
-    return $1 if $name =~ /^[+](.+)$/;
     return join '::', $base, $name;
 }
 
