@@ -4,8 +4,11 @@ use Test::More;
 use Test::Exception;
 
 BEGIN {
-    plan 'skip_all', 'testing parameterized roles requires MooseX::Role::Parameterized'
-      unless eval 'require MooseX::Role::Parameterized; 1';
+    plan 'skip_all', 'testing parameterized roles requires MooseX::Role::Parameterized 0.13'
+      unless eval {
+        require MooseX::Role::Parameterized;
+        MooseX::Role::Parameterized->VERSION('0.13');
+      };
 
     plan tests => 11;
 }
