@@ -1,3 +1,7 @@
+        - Stop pretending the created classes are anonymous.
+          They used to close over their own metaclass, so they were never
+          cleaned up anyway and only made debugging unnecessarily hard as
+          all instances referenced the metaclass as well.
         - Require newer version of MX::Role::Parameterized in the parameterized
           role test. (RT#49873).
 

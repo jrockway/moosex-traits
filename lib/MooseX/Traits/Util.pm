@@ -55,6 +55,8 @@ sub resolve_traits {
     } @traits;
 }
 
+my $anon_serial = 0;
+
 sub new_class_with_traits {
     my ($class, @traits) = @_;
 
@@ -63,12 +65,12 @@ sub new_class_with_traits {
     my $meta;
     @traits = resolve_traits($class, @traits);
     if (@traits) {
-        $meta = $class->meta->create_anon_class(
+        $meta = $class->meta->create(
+            join(q{::} => 'MooseX::Traits::__ANON__::SERIAL', ++$anon_serial),
             superclasses => [ $class->meta->name ],
             roles        => \@traits,
             cache        => 1,
         );
-        $meta->add_method('meta' => sub { $meta });
     }
 
     # if no traits were given just return the class meta
