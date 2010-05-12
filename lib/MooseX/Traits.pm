@@ -8,7 +8,7 @@ use warnings::register;
 
 use namespace::autoclean;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.10';
 our $AUTHORITY = 'id:JROCKWAY';
 
 has '_trait_namespace' => (
