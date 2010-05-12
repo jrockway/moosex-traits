@@ -16,4 +16,6 @@ build_requires 'Test::More';
 build_requires 'ok';
 author_requires 'MooseX::Role::Parameterized' => '0.13';
 
+resources Respository => 'git://github.com/jrockway/moosex-traits.git';
+
 WriteAll();
