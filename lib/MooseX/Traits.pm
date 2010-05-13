@@ -126,7 +126,7 @@ with the desired roles applied, or apply roles to the instance
 one-by-one, he can just create a new class from yours with
 C<with_traits>, and then instantiate that.
 
-There is also C<new_with_traits>, which exists for compatability
+There is also C<new_with_traits>, which exists for compatibility
 reasons.  It accepts a C<traits> parameter, creates a new class with
 those traits, and then insantiates it.
 
